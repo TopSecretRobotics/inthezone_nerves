@@ -54,9 +54,17 @@ let socket = new Socket("/socket", {params: {token: window.userToken}})
 socket.connect()
 
 // Now that you are connected, you can join channels with a topic:
-let channel = socket.channel("topic:subtopic", {})
+let channel = socket.channel("serial:ttyS0", {})
 channel.join()
   .receive("ok", resp => { console.log("Joined successfully", resp) })
   .receive("error", resp => { console.log("Unable to join", resp) })
+
+channel.on("status", (message) => {
+  document.querySelector('#status').innerText += JSON.stringify(message) + '\n'
+})
+
+channel.on("data", ({ data }) => {
+  document.querySelector('#data').innerText += window.atob(data)
+})
 
 export default socket

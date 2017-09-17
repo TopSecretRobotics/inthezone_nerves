@@ -31,7 +31,7 @@ config :firmware, interface: :wlan0
 
 config :ui, UiWeb.Endpoint,
   http: [port: 80],
-  url: [host: "localhost", port: 80],
+  url: [host: "192.168.86.200", port: 80],
   secret_key_base: "QvXVdSngFcyZVlofQyzmfSBBSPDxXqurdOnvVLUHlk4MSBElzGe0hJNFsJYNjYeR",
   root: Path.dirname(__DIR__),
   server: true,

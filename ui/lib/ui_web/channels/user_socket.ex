@@ -2,7 +2,7 @@ defmodule UiWeb.UserSocket do
   use Phoenix.Socket
 
   ## Channels
-  # channel "room:*", UiWeb.RoomChannel
+  channel "serial:*", UiWeb.SerialChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket

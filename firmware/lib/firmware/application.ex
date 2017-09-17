@@ -11,7 +11,8 @@ defmodule Firmware.Application do
     # Define workers and child supervisors to be supervised
     children = [
       supervisor(Phoenix.PubSub.PG2, [Nerves.PubSub, [poolsize: 1]]),
-      worker(Task, [fn -> start_network() end], restart: :transient)
+      worker(Task, [fn -> start_network() end], restart: :transient),
+      worker(Firmware.Serial, [], restart: :permanent)
       # worker(Firmware.Worker, [arg1, arg2, arg3]),
     ]
 
