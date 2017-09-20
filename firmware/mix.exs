@@ -52,7 +52,10 @@ defmodule Firmware.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   def deps do
-    [{:nerves, "~> 0.7", runtime: false}] ++
+    [
+      {:nerves, "~> 0.7", runtime: false},
+      {:gen_state_machine, "~> 2.0"}
+    ] ++
     deps(@target)
   end
 
@@ -64,6 +67,8 @@ defmodule Firmware.Mixfile do
       {:nerves_runtime, "~> 0.4"},
       {:nerves_network, "~> 0.3"},
       {:nerves_uart, "~> 0.1"},
+      {:serial_framing_protocol, path: "../serial_framing_protocol"},
+      {:vex, path: "../vex"},
       {:ui, path: "../ui"}
     ] ++ system(target)
   end
