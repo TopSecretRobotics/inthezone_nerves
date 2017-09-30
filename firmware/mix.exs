@@ -12,7 +12,7 @@ defmodule Firmware.Mixfile do
   def project do
     [app: :firmware,
      version: "0.1.0",
-     elixir: "~> 1.4",
+     elixir: "~> 1.5",
      target: @target,
      archives: [nerves_bootstrap: "~> 0.6"],
      deps_path: "deps/#{@target}",
@@ -54,6 +54,7 @@ defmodule Firmware.Mixfile do
   def deps do
     [
       {:nerves, "~> 0.7", runtime: false},
+      {:nerves_firmware_ssh, github: "fhunleth/nerves_firmware_ssh"},
       {:gen_state_machine, "~> 2.0"}
     ] ++
     deps(@target)
@@ -67,7 +68,6 @@ defmodule Firmware.Mixfile do
       {:nerves_runtime, "~> 0.4"},
       {:nerves_network, "~> 0.3"},
       {:nerves_uart, "~> 0.1"},
-      {:serial_framing_protocol, path: "../serial_framing_protocol"},
       {:vex, path: "../vex"},
       {:ui, path: "../ui"}
     ] ++ system(target)

@@ -1,7 +1,26 @@
 defmodule UiWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :ui
+  # use Absinthe.Phoenix.Endpoint
+
+  @behaviour Absinthe.Subscription.Pubsub
+
+  def publish_mutation(topic, mutation_result, subscribed_fields) do
+    Absinthe.Phoenix.Endpoint.publish_mutation(@otp_app, __MODULE__, topic, mutation_result, subscribed_fields)
+  end
+
+  def publish_subscription(topic, data) do
+    case data do
+      %{ data: %{ "events" => [] } } ->
+        # Ignore empty events
+        :ok
+      _ ->
+        Absinthe.Phoenix.Endpoint.publish_subscription(@otp_app, __MODULE__, topic, data)
+    end
+  end
 
   socket "/socket", UiWeb.UserSocket
+
+  plug :static_index
 
   # Serve at "/" the static files from "priv/static" directory.
   #
@@ -9,7 +28,8 @@ defmodule UiWeb.Endpoint do
   # when deploying your static files in production.
   plug Plug.Static,
     at: "/", from: :ui, gzip: false,
-    only: ~w(css fonts images js favicon.ico robots.txt)
+    only_matching: ~w(fonts img js statics app index.html robots.txt)
+    # only: ~w(css fonts img js statics favicon.ico index.html robots.txt)
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
@@ -25,7 +45,7 @@ defmodule UiWeb.Endpoint do
   plug Plug.Parsers,
     parsers: [:urlencoded, :multipart, :json],
     pass: ["*/*"],
-    json_decoder: Poison
+    json_decoder: OJSON
 
   plug Plug.MethodOverride
   plug Plug.Head
@@ -53,5 +73,13 @@ defmodule UiWeb.Endpoint do
     else
       {:ok, config}
     end
+  end
+
+  @doc false
+  defp static_index(conn = %Plug.Conn{ path_info: [] }, _opts) do
+    %{ conn | path_info: ["index.html"] }
+  end
+  defp static_index(conn, _opts) do
+    conn
   end
 end

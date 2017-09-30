@@ -1,0 +1,13 @@
+subscription ObserveRobotSocketEvents($exclude: [String]!) {
+  events: observeRobotSocketEvents(exclude: $exclude) {
+    id
+    source
+    ... on EventStatus {
+      connected
+    }
+    ... on EventFrame {
+      direction
+      frame
+    }
+  }
+}

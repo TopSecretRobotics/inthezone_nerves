@@ -4,7 +4,7 @@ defmodule Vex.Mixfile do
   def project do
     [app: :vex,
      version: "0.1.0",
-     elixir: "~> 1.4",
+     elixir: "~> 1.5",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      deps: deps()]
@@ -32,7 +32,10 @@ defmodule Vex.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:gen_state_machine, "~> 2.0"}
+      {:gen_state_machine, "~> 2.0"},
+      {:ojson, "~> 1.0"},
+      {:phoenix_pubsub, "~> 1.0"},
+      {:serial_framing_protocol, github: "potatosalad/erlang-serial_framing_protocol", branch: "master"}
     ]
   end
 end

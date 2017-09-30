@@ -1,0 +1,59 @@
+query RobotServerEvents($exclude: [String]!) {
+  events: robotServerEvents(exclude: $exclude) {
+    id
+    source
+    ... on EventStatus {
+      connected
+    }
+    ... on EventPing {
+      direction
+      seqId
+    }
+    ... on EventPong {
+      direction
+      seqId
+    }
+    ... on EventInfo {
+      direction
+      topic
+      subtopic
+      value
+    }
+    ... on EventData {
+      direction
+      reqId
+      topic
+      subtopic
+      flag {
+        end
+        pub
+        error
+      }
+      ticks
+      value
+    }
+    ... on EventRead {
+      direction
+      reqId
+      topic
+      subtopic
+    }
+    ... on EventWrite {
+      direction
+      reqId
+      topic
+      subtopic
+      value
+    }
+    ... on EventSubscribe {
+      direction
+      reqId
+      topic
+      subtopic
+    }
+    ... on EventUnsubscribe {
+      direction
+      reqId
+    }
+  }
+}

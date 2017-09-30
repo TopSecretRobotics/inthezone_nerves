@@ -19,6 +19,19 @@ defmodule UiWeb.Router do
     get "/", PageController, :index
   end
 
+  scope "/" do
+    forward "/graphql", Absinthe.Plug, [
+      schema: UiGraph.Schema,
+      json_codec: OJSON
+    ]
+    forward "/graphiql", Absinthe.Plug.GraphiQL, [
+      schema: UiGraph.Schema,
+      socket: UiWeb.UserSocket,
+      interface: :simple,
+      json_codec: OJSON
+    ]
+  end
+
   # Other scopes may use custom stacks.
   # scope "/api", UiWeb do
   #   pipe_through :api

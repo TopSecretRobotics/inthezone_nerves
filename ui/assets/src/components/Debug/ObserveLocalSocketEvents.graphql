@@ -1,0 +1,13 @@
+subscription ObserveLocalSocketEvents($exclude: [String]!) {
+  events: observeLocalSocketEvents(exclude: $exclude) {
+    id
+    source
+    ... on EventStatus {
+      connected
+    }
+    ... on EventFrame {
+      direction
+      frame
+    }
+  }
+}

@@ -1,11 +1,19 @@
 defmodule UiWeb.UserSocket do
   use Phoenix.Socket
+  use Absinthe.Phoenix.Socket
 
   ## Channels
-  channel "serial:*", UiWeb.SerialChannel
+  channel "serial:*", UiWeb.SerialChannel, via: [:websocket]
+  channel "system:*", UiWeb.SystemChannel, via: [:websocket]
 
   ## Transports
-  transport :websocket, Phoenix.Transports.WebSocket
+  transport :websocket, Phoenix.Transports.WebSocket, [
+    check_origin: false,
+    serializer: [
+      {UiWeb.WebSocketV1Serializer, "~> 1.0.0"},
+      {UiWeb.WebSocketV2Serializer, "~> 2.0.0"}
+    ]
+  ]
   # transport :longpoll, Phoenix.Transports.LongPoll
 
   # Socket params are passed from the client and can
@@ -20,7 +28,11 @@ defmodule UiWeb.UserSocket do
   # See `Phoenix.Token` documentation for examples in
   # performing token verification on connect.
   def connect(_params, socket) do
-    {:ok, socket}
+    absinthe_config = %{
+      schema: UiGraph.Schema,
+      context: %{}
+    }
+    {:ok, assign(socket, :absinthe, absinthe_config)}
   end
 
   # Socket id's are topics that allow you to identify all sockets for a given user:

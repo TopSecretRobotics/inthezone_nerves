@@ -29,6 +29,9 @@ config :nerves_network, :default,
 # config :firmware, interface: :eth0
 config :firmware, interface: :wlan0
 
+config :absinthe, log: false
+config :logger, level: :error
+
 config :ui, UiWeb.Endpoint,
   http: [port: 80],
   url: [host: "192.168.86.200", port: 80],
@@ -38,6 +41,18 @@ config :ui, UiWeb.Endpoint,
   render_errors: [view: UiWeb.ErrorView, accepts: ~w(html json)],
   pubsub: [name: Ui.PubSub,
            adapter: Phoenix.PubSub.PG2]
+
+config :ui, ecto_repos: [Ui.Repo]
+
+config :ui, Ui.Repo, [
+  adapter: Sqlite.Ecto2,
+  database: "/root/#{Mix.env}.sqlite3"
+]
+
+config :nerves_firmware_ssh,
+  authorized_keys: [
+    "ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAIBn0KisbG467o35uOGF0Vew9JFyjr4lwXu5f6oK4MoNdH4Yky7pUybkPy74A39in6Ip5g4U3Qni78HidAGC9lLYW7KIuCl2vfyKIvBRVGCE2VBT9ae4MYQBYkvg6kHN2XMdahbj0mlyhSXhQ6rExYxSZhsOGTpZZEk5vYB7SZH3hQ=="
+  ]
 
 # Use bootloader to start the main application. See the bootloader
 # docs for separating out critical OTP applications such as those

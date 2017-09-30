@@ -1,0 +1,13 @@
+query RobotSocketEvents($exclude: [String]!) {
+  events: robotSocketEvents(exclude: $exclude) {
+    id
+    source
+    ... on EventStatus {
+      connected
+    }
+    ... on EventFrame {
+      direction
+      frame
+    }
+  }
+}

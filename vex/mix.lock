@@ -1,1 +1,5 @@
-%{"gen_state_machine": {:hex, :gen_state_machine, "2.0.1", "85efd5a0376929c3a4246dd943e17564a2908c7ddd7acd242d84594e785d83f8", [], [], "hexpm"}}
+%{"elixir_make": {:hex, :elixir_make, "0.4.0", "992f38fabe705bb45821a728f20914c554b276838433349d4f2341f7a687cddf", [:mix], [], "hexpm"},
+  "gen_state_machine": {:hex, :gen_state_machine, "2.0.1", "85efd5a0376929c3a4246dd943e17564a2908c7ddd7acd242d84594e785d83f8", [:mix], [], "hexpm"},
+  "ojson": {:hex, :ojson, "1.0.0", "fd28614eadaec00a15cdb2f53f29d8717a812a508ddb80d202f2f2e2aaeabbcc", [:mix, :rebar3], [], "hexpm"},
+  "phoenix_pubsub": {:hex, :phoenix_pubsub, "1.0.2", "bfa7fd52788b5eaa09cb51ff9fcad1d9edfeb68251add458523f839392f034c1", [], [], "hexpm"},
+  "serial_framing_protocol": {:git, "https://github.com/potatosalad/erlang-serial_framing_protocol.git", "54357a86acac4eea18651acd33fb6063f23b7662", [branch: "master"]}}

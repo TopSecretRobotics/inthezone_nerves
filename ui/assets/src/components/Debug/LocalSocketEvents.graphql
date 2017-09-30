@@ -1,0 +1,13 @@
+query LocalSocketEvents($exclude: [String]!) {
+  events: localSocketEvents(exclude: $exclude) {
+    id
+    source
+    ... on EventStatus {
+      connected
+    }
+    ... on EventFrame {
+      direction
+      frame
+    }
+  }
+}

@@ -1,6 +1,4 @@
 <div>
-  <h3>Status</h3>
-  <pre id="status"></pre>
-  <h3>Data</h3>
-  <pre id="data"></pre>
+  <h3>Events</h3>
+  <pre id="events"></pre>
 </div>
