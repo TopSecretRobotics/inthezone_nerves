@@ -58,30 +58,14 @@ export default {
         config {
           drive {
             id
-            ne {
-              id
-              index
-              ticks
-              value
-            }
-            nw {
-              id
-              index
-              ticks
-              value
-            }
-            se {
-              id
-              index
-              ticks
-              value
-            }
-            sw {
-              id
-              index
-              ticks
-              value
-            }
+            northeastMotor
+            northwestMotor
+            southeastMotor
+            southwestMotor
+            northeastReversed
+            northwestReversed
+            southeastReversed
+            southwestReversed
           }
         }
       }`,

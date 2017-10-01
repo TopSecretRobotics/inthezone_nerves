@@ -46,6 +46,13 @@ defmodule Vex.MotorState do
     end
   end
 
+  def fill(%__MODULE__{ current: nil }, value) when is_list(value) do
+    value
+  end
+  def fill(%__MODULE__{ current: {_, a} }, b) when is_list(b) do
+    make_fill(a, b, [])
+  end
+
   def size(%__MODULE__{ current: {_, value} }) do
     length(value)
   end
@@ -87,6 +94,17 @@ defmodule Vex.MotorState do
   end
   defp diff([], [], current, diff) do
     {true, :lists.reverse(current), :lists.reverse(diff)}
+  end
+
+  @doc false
+  defp make_fill([{index, _} | a], [{index, value} | b], acc) do
+    make_fill(a, b, [{index, value} | acc])
+  end
+  defp make_fill([{index, value} | a], b, acc) do
+    make_fill(a, b, [{index, value} | acc])
+  end
+  defp make_fill([], [], acc) do
+    :lists.reverse(acc)
   end
 
   @doc false

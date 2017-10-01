@@ -5,6 +5,7 @@ if Code.ensure_loaded?(Nerves.UART) do
 
     @priority 100
     @reopen 1000
+    @wait 2
 
     @events Vex.Robot.Server.Socket.Events
     @uart Nerves.UART
@@ -25,7 +26,11 @@ if Code.ensure_loaded?(Nerves.UART) do
       defstruct [
         device: nil,
         options: nil,
-        uart: nil
+        uart: nil,
+        uart_buffer: <<>>,
+        uart_wait: false,
+        vex_buffer: <<>>,
+        vex_wait: false
       ]
     end
 
@@ -36,6 +41,8 @@ if Code.ensure_loaded?(Nerves.UART) do
       true = Vex.Robot.IO.register_input(@priority, :erlang.self())
       device = Application.get_env(:vex, :nerves_socket_device, "ttyS0")
       options = Application.get_env(:vex, :nerves_socket_device_options, [
+        data_bits: 8,
+        parity: :none,
         stop_bits: 1,
         speed: 115200
       ])
@@ -52,20 +59,37 @@ if Code.ensure_loaded?(Nerves.UART) do
     @impl GenStateMachine
     # State Enter Events
     def handle_event(:enter, _old_state, :open, _data) do
-      # :ok = @server.vex_socket_connected()
       :keep_state_and_data
     end
     def handle_event(:enter, _old_state, :closed, _data) do
-      # :ok = @server.vex_socket_disconnected()
-      {:keep_state_and_data, [{:state_timeout, @reopen, :open}]}
+      {:keep_state_and_data, [{:state_timeout, 0, :open}]}
     end
     # State Timeout Events
     def handle_event(:state_timeout, :open, :closed, data = %{ device: device, options: options, uart: uart }) do
-      case @uart.open(uart, device, options) do
-        :ok ->
-          {:next_state, :open, data}
-        _ ->
-          {:keep_state_and_data, [{:state_timeout, @reopen, :open}]}
+      with :ok <- @uart.open(uart, device, options),
+         :ok <- @uart.flush(uart, :both) do
+        {:next_state, :open, data}
+      else _ ->
+        {:keep_state_and_data, [{:state_timeout, @reopen, :open}]}
+      end
+    end
+    # Generic Timeout Events
+    def handle_event({:timeout, :uart}, :wait, :open, data = %{ uart: uart, uart_buffer: iodata, uart_wait: true }) do
+      data = %{ data | uart_buffer: <<>>, uart_wait: false }
+      :ok = @events.frame_out(iodata)
+      :ok = Vex.Robot.IO.output(iodata)
+      :ok = @uart.configure(uart, active: true)
+      {:keep_state, data}
+    end
+    def handle_event({:timeout, :vex}, :wait, :open, data = %{ vex_buffer: iodata, vex_wait: true, uart: uart }) do
+      data = %{ data | vex_buffer: <<>>, vex_wait: false }
+      :ok = @events.frame_in(iodata)
+      with :ok <- @uart.write(uart, iodata),
+           :ok <- @uart.drain(uart) do
+        {:keep_state, data}
+      else _ ->
+        data = cleanup(data)
+        {:next_state, :closed, data}
       end
     end
     # Call Events
@@ -76,45 +100,56 @@ if Code.ensure_loaded?(Nerves.UART) do
         else
           false
         end
-      {:keep_state_and_data, [{:reply, from, reply}]}
+      actions = [{:reply, from, reply}]
+      {:keep_state_and_data, actions}
     end
     # Cast Events
     def handle_event(:cast, :disconnect, :closed, _data) do
       :keep_state_and_data
     end
-    def handle_event(:cast, :disconnect, :open, data = %Data{ uart: uart }) do
-      _ = Nerves.UART.close(uart)
+    def handle_event(:cast, :disconnect, :open, data) do
+      data = cleanup(data)
       {:next_state, :closed, data}
     end
     # Info Events
     def handle_event(:info, {:vex_robot_input, _iodata}, :closed, _data) do
       :keep_state_and_data
     end
-    def handle_event(:info, {:vex_robot_input, iodata}, :open, data = %Data{ uart: uart }) do
-      :ok = @events.frame_in(iodata)
-      # require Logger
-      # Logger.info("writing #{inspect iodata} to uart for #{inspect data.device}")
-      case Nerves.UART.write(uart, iodata) do
-        :ok ->
-          :keep_state_and_data
-        _ ->
-          _ = Nerves.UART.close(uart)
-          {:next_state, :closed, data}
+    def handle_event(:info, {:vex_robot_input, iodata}, :open, data = %Data{ vex_buffer: buffer, vex_wait: wait }) do
+      buffer = << buffer :: binary(), iodata :: binary() >>
+      data = %{ data | vex_buffer: buffer }
+      if wait do
+        {:keep_state, data}
+      else
+        data = %{ data | vex_wait: true }
+        actions = [{{:timeout, :vex}, @wait, :wait}]
+        {:keep_state, data, actions}
       end
     end
     def handle_event(:info, {:nerves_uart, _, _}, :closed, _data) do
       :keep_state_and_data
     end
-    def handle_event(:info, {:nerves_uart, _, {:error, _reason}}, :open, data = %Data{ uart: uart }) do
-      _ = Nerves.UART.close(uart)
+    def handle_event(:info, {:nerves_uart, _, {:error, _reason}}, :open, data) do
+      data = cleanup(data)
       {:next_state, :closed, data}
     end
-    def handle_event(:info, {:nerves_uart, device, iodata}, :open, _data = %Data{ device: device }) do
-      :ok = @events.frame_out(iodata)
-      # require Logger
-      # Logger.info("reading #{inspect iodata} to uart for #{inspect device}")
-      :ok = Vex.Robot.IO.output(iodata)
-      :keep_state_and_data
+    def handle_event(:info, {:nerves_uart, device, iodata}, :open, data = %Data{ device: device, uart: uart, uart_buffer: buffer, uart_wait: wait }) do
+      buffer = << buffer :: binary(), iodata :: binary() >>
+      data = %{ data | uart_buffer: buffer }
+      if wait do
+        {:keep_state, data}
+      else
+        data = %{ data | uart_wait: true }
+        :ok = @uart.configure(uart, active: false)
+        actions = [{{:timeout, :uart}, @wait, :wait}]
+        {:keep_state, data, actions}
+      end
+    end
+
+    @doc false
+    defp cleanup(data = %{ uart: uart }) do
+      _ = @uart.close(uart)
+      %{ data | uart_buffer: <<>>, uart_wait: false, vex_buffer: <<>>, vex_wait: false }
     end
 
   end

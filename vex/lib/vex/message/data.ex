@@ -4,6 +4,7 @@ defmodule Vex.Message.Data do
   @topic_clock 0x01
   @topic_motor 0x02
   @topic_smartmotor 0x03
+  @topic_cassette 0x06
 
   defstruct [
     req_id: nil,
@@ -65,6 +66,7 @@ defmodule Vex.Message.Data do
       @topic_clock -> Data.Clock
       @topic_motor -> Data.Motor
       @topic_smartmotor -> Data.Smartmotor
+      @topic_cassette -> Data.Cassette
     end
   end
 
@@ -82,6 +84,7 @@ defmodule Vex.Message.Data do
       Data.Clock -> @topic_clock
       Data.Motor -> @topic_motor
       Data.Smartmotor -> @topic_smartmotor
+      Data.Cassette -> @topic_cassette
     end
   end
 

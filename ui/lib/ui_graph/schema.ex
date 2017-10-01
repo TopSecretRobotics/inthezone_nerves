@@ -5,35 +5,40 @@ defmodule UiGraph.Schema do
   alias __MODULE__, as: Schema
 
   # import_types Schema.Types
+  import_types Schema.Cassette
   import_types Schema.Config
+  import_types Schema.Cortex
   import_types Schema.Drive
   import_types Schema.Event
   import_types Schema.Motor
+  import_types Schema.PubSub
   import_types Schema.Robot
-  import_types Schema.VCR
 
   query do
+    import_fields :cassette_queries
     import_fields :config_queries
+    import_fields :cortex_queries
     import_fields :drive_queries
     import_fields :event_queries
     import_fields :motor_queries
+    import_fields :pubsub_queries
     import_fields :robot_queries
-    import_fields :vcr_queries
     node field do
       resolve &Schema.node_field/3
     end
   end
 
   mutation do
+    import_fields :cassette_mutations
     import_fields :motor_mutations
-    import_fields :vcr_mutations
   end
 
   subscription do
+    import_fields :cassette_subscriptions
+    import_fields :cortex_subscriptions
     import_fields :event_subscriptions
     import_fields :motor_subscriptions
     import_fields :robot_subscriptions
-    import_fields :vcr_subscriptions
   end
 
   node interface do
@@ -47,7 +52,7 @@ defmodule UiGraph.Schema do
   def node_field(parent, attrs, info) do
     case attrs do
       %{ type: :cassette, id: id } ->
-        Schema.VCR.node(parent, id, info)
+        Schema.Cassette.node(parent, id, info)
       %{ type: :drive, id: id } ->
         Schema.Drive.node(parent, id, info)
       %{ type: :motor, id: id } ->

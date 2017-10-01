@@ -149,23 +149,22 @@ export default {
       this.sw = sw
       if (this.config && this.config.drive) {
         const drive = this.config.drive
-        if (drive.ne && drive.nw && drive.se && drive.sw) {
-          return this.$apollo.mutate({
-            mutation: gql`mutation WriteDriveMotors($value: [MotorCommand]!) {
-              writeAllMotors(value: $value)
-            }`,
-            variables: {
-              value: [
-                { index: drive.ne.index, value: this.ne },
-                { index: drive.nw.index, value: this.nw },
-                { index: drive.se.index, value: this.se },
-                { index: drive.sw.index, value: this.sw }
-              ]
-            }
-          }).then((result) => {
-            console.log('result: %o', result)
-          })
-        }
+        return this.$apollo.mutate({
+          mutation: gql`mutation WriteDriveMotors($value: [MotorCommand]!) {
+            writeAllMotors(value: $value)
+          }`,
+          variables: {
+            value: [
+              { index: drive.northeastMotor, value: this.ne },
+              { index: drive.northwestMotor, value: this.nw },
+              { index: drive.southeastMotor, value: this.se },
+              { index: drive.southwestMotor, value: this.sw }
+            ]
+          }
+        })
+        // }).then((result) => {
+        //   console.log('result: %o', result)
+        // })
       }
       return false
     },
@@ -175,11 +174,19 @@ export default {
       }
       this.x = x
       this.y = y
-      const ne = driveSpeed(this.y - this.x)
-      const nw = driveSpeed(this.y + this.x)
-      const se = driveSpeed(this.y - this.x)
-      const sw = driveSpeed(this.y + this.x)
-      return this.updateImmediate(ne, nw, se, sw)
+      if (this.config && this.config.drive) {
+        const drive = this.config.drive
+        const ne = driveSpeed(this.y - this.x) * (drive.northeastReversed ? -1 : 1)
+        const nw = driveSpeed(this.y + this.x) * (drive.northwestReversed ? -1 : 1)
+        const se = driveSpeed(this.y - this.x) * (drive.southeastReversed ? -1 : 1)
+        const sw = driveSpeed(this.y + this.x) * (drive.southwestReversed ? -1 : 1)
+        // const ne = driveSpeed(this.y - this.x)
+        // const nw = driveSpeed(this.y + this.x)
+        // const se = driveSpeed(this.y - this.x)
+        // const sw = driveSpeed(this.y + this.x)
+        return this.updateImmediate(ne, nw, se, sw)
+      }
+      return false
     },
     update: controlUpdate,
     updateCancel: controlUpdate.cancel

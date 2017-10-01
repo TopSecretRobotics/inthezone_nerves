@@ -10,7 +10,7 @@
         template(v-if="isConnected")
           //- q-toolbar-title(padding="1")
             span(slot="subtitle") {{ robotTicks.toLocaleString() }}
-          div(style="display: inline-block; margin-right: 10px;", v-if="robotMainBattery !== null && robotBackupBattery !== null && robotTicks !== null") {{ robotMainBattery.toFixed(2) }} {{ robotBackupBattery.toFixed(2) }} {{ robotTicks.toLocaleString() }}
+          div(style="display: inline-block; margin-right: 10px;", v-if="cortex") {{ cortex.mainBattery.toFixed(2) }} {{ cortex.backupBattery.toFixed(2) }} {{ cortex.ticks.toLocaleString() }}
           q-spinner-puff(color="white", size="36")
             //- br
             //- span {{ robotTicks.toLocaleString() }}
@@ -79,78 +79,28 @@ export default {
     QTooltip
   },
   apollo: {
-    robotMainBattery: {
-      query: gql`query RobotMainBattery {
-        robotMainBattery: mainBattery
-      }`,
-      fetchPolicy: 'network-only',
-      subscribeToMore: {
-        document: gql`subscription ObserveRobotMainBattery {
-          observeMainBattery
-        }`,
-        updateQuery: (previousResult, { subscriptionData }) => {
-          if (previousResult.robotMainBattery === subscriptionData.data.observeMainBattery) {
-            return previousResult
-          }
-          return {
-            robotMainBattery: subscriptionData.data.observeMainBattery
-          }
+    cortex: {
+      query: gql`query Cortex {
+        cortex {
+          backupBattery
+          connected
+          mainBattery
+          ticks
         }
-      }
-    },
-    robotBackupBattery: {
-      query: gql`query RobotBackupBattery {
-        robotBackupBattery: BackupBattery
       }`,
       fetchPolicy: 'network-only',
       subscribeToMore: {
-        document: gql`subscription ObserveRobotBackupBattery {
-          observeBackupBattery
+        document: gql`subscription ObserveCortex {
+          observeCortex {
+            backupBattery
+            connected
+            mainBattery
+            ticks
+          }
         }`,
         updateQuery: (previousResult, { subscriptionData }) => {
-          if (previousResult.robotBackupBattery === subscriptionData.data.observeBackupBattery) {
-            return previousResult
-          }
           return {
-            robotBackupBattery: subscriptionData.data.observeBackupBattery
-          }
-        }
-      }
-    },
-    robotTicks: {
-      query: gql`query RobotTicks {
-        robotTicks: ticks
-      }`,
-      fetchPolicy: 'network-only',
-      subscribeToMore: {
-        document: gql`subscription ObserveRobotTicks {
-          observeTicks
-        }`,
-        updateQuery: (previousResult, { subscriptionData }) => {
-          if (previousResult.robotTicks === subscriptionData.data.observeTicks) {
-            return previousResult
-          }
-          return {
-            robotTicks: subscriptionData.data.observeTicks
-          }
-        }
-      }
-    },
-    serverIsConnected: {
-      query: gql`query ServerIsConnected {
-        serverIsConnected: isConnected
-      }`,
-      fetchPolicy: 'network-only',
-      subscribeToMore: {
-        document: gql`subscription ObserveServerIsConnected {
-          observeIsConnected
-        }`,
-        updateQuery: (previousResult, { subscriptionData }) => {
-          if (previousResult.serverIsConnected === subscriptionData.data.observeIsConnected) {
-            return previousResult
-          }
-          return {
-            serverIsConnected: subscriptionData.data.observeIsConnected
+            cortex: subscriptionData.data.observeCortex
           }
         }
       }
@@ -161,7 +111,7 @@ export default {
       if (this.preventColorFlash === true) {
         return true
       }
-      return !!(this.socketIsConnected && this.serverIsConnected)
+      return !!(this.socketIsConnected && this.cortex && this.cortex.connected)
     },
     toolbarColor () {
       return (this.isConnected) ? 'primary' : 'negative'

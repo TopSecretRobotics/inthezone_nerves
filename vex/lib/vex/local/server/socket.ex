@@ -82,6 +82,8 @@ defmodule Vex.Local.Server.Socket do
     :keep_state_and_data
   end
   def handle_event(:cast, :disconnect, :connected, data = %Data{ sfp: sfp }) do
+    # require Logger
+    # Logger.info("who the heck is calling disconnect?")
     {:disconnected, ^sfp} = @protocol.reset(sfp, :connected)
     {:next_state, :disconnected, data}
   end
@@ -93,6 +95,8 @@ defmodule Vex.Local.Server.Socket do
         data = %{ data | sfp: sfp }
         {:keep_state, data}
       {new_state, sfp} ->
+        # require Logger
+        # Logger.info("frame out #{inspect iodata}: #{inspect state} -> #{inspect new_state}")
         data = %{ data | sfp: sfp }
         {:next_state, new_state, data}
     end
@@ -123,6 +127,8 @@ defmodule Vex.Local.Server.Socket do
         data = %{ data | sfp: sfp }
         {:keep_state, data}
       {new_state, sfp} ->
+        # require Logger
+        # Logger.info("frame in  #{inspect iodata}: #{inspect state} -> #{inspect new_state}")
         data = %{ data | sfp: sfp }
         {:next_state, new_state, data}
     end

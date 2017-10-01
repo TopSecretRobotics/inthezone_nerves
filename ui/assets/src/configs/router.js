@@ -28,7 +28,7 @@ export default new VueRouter({
       path: '/motors',
       component: load('Motors'),
       children: [
-        { path: '', component: load('Motors/Overview'), name: 'motors' },
+        { path: '', component: load('Motors/Control'), name: 'motors' },
         { path: 'graph', component: load('Motors/Graph'), name: 'motorsGraph' }
       ]
     },
@@ -44,8 +44,9 @@ export default new VueRouter({
       path: '/vcr',
       component: load('VCR'),
       children: [
-        { path: '', component: load('VCR/Cassettes'), name: 'vcr' },
-        { path: 'cassette/:cassetteId', component: load('VCR/Cassette'), props: true, name: 'vcrCassette' }
+        { path: '', component: load('VCR/Home'), name: 'vcr' },
+        { path: 'cassettes', component: load('VCR/Cassettes'), name: 'vcrCassettes' },
+        { path: 'cassettes/:cassetteId', component: load('VCR/Cassette'), props: true, name: 'vcrCassette' }
       ]
     },
     {
@@ -53,6 +54,7 @@ export default new VueRouter({
       component: load('Debug'),
       children: [
         { path: '', component: load('Debug/Home'), name: 'debug' },
+        { path: 'pubsub', component: load('Debug/PubSub'), name: 'debugPubSub' },
         { path: 'local-server', component: load('Debug/LocalServer'), name: 'debugLocalServer' },
         { path: 'local-socket', component: load('Debug/LocalSocket'), name: 'debugLocalSocket' },
         { path: 'robot-server', component: load('Debug/RobotServer'), name: 'debugRobotServer' },

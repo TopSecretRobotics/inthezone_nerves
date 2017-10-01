@@ -15,7 +15,7 @@ defmodule Vex.Logger do
     # :ok = :vex_server_event.add_handler(:vex_server_event_handler, :erlang.self())
     # :ok = Vex.Robot.Server.Socket.Events.subscribe_all()
     # :ok = Vex.Robot.Server.Events.subscribe_all()
-    # :ok = Vex.Local.Server.Socket.Events.subscribe_all()
+    :ok = Vex.Local.Server.Socket.Events.subscribe_all()
     :ok = Vex.Local.Server.Events.subscribe_all()
     {:ok, nil}
   end

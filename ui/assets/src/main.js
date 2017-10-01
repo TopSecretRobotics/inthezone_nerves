@@ -21,6 +21,9 @@ import VueApollo from 'vue-apollo'
 import apolloProvider from './configs/apollo'
 Vue.use(VueApollo)
 
+import VueMoment from 'vue-moment'
+Vue.use(VueMoment)
+
 import VueNonreactive from 'vue-nonreactive'
 Vue.use(VueNonreactive)
 

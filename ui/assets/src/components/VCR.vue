@@ -6,8 +6,9 @@ div
     q-toolbar-title VCR
     q-btn(color="negative", icon="stop", @click="stopAllMotors()") Stop All Motors
   q-tabs(color="tertiary")
-    q-route-tab(name="cassettes", slot="title", label="Cassettes", :to="{ name: 'vcr' }", exact)
-  router-view(:cassettes="cassettes")
+    q-route-tab(name="home", slot="title", label="Home", :to="{ name: 'vcr' }", exact)
+    q-route-tab(name="cassettes", slot="title", label="Cassettes", :to="{ name: 'vcrCassettes' }")
+  router-view
 </template>
 
 <script>
@@ -50,35 +51,6 @@ export default {
     QToggle,
     QToolbar,
     QToolbarTitle
-  },
-  apollo: {
-    cassettes: {
-      query: gql`query Cassettes {
-        cassettes {
-          id
-          name
-          blank
-          startAt
-          stopAt
-          insertedAt
-          updatedAt
-        }
-      }`,
-      fetchPolicy: 'network-only',
-      subscribeToMore: {
-        document: gql`subscription ObserveCassettes {
-          observeCassettes {
-            id
-            name
-            blank
-            startAt
-            stopAt
-            insertedAt
-            updatedAt
-          }
-        }`
-      }
-    }
   },
   methods: {
     stopAllMotors: debounce(function () {

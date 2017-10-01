@@ -5,10 +5,14 @@ defmodule UiGraph.Schema.Drive do
 
   node object :drive do
     field :name, :string
-    field :ne, type: :motor
-    field :nw, type: :motor
-    field :se, type: :motor
-    field :sw, type: :motor
+    field :northeast_motor, :integer
+    field :northwest_motor, :integer
+    field :southeast_motor, :integer
+    field :southwest_motor, :integer
+    field :northeast_reversed, :boolean
+    field :northwest_reversed, :boolean
+    field :southeast_reversed, :boolean
+    field :southwest_reversed, :boolean
   end
 
   object :drive_queries do

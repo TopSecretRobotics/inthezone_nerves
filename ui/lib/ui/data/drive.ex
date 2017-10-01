@@ -8,10 +8,18 @@ defmodule Ui.Data.Drive do
   @primary_key {:id, :integer, autogenerate: false, read_after_writes: false}
   schema "drives" do
     field :name, :string
-    belongs_to :ne, Ui.Data.Motor
-    belongs_to :nw, Ui.Data.Motor
-    belongs_to :se, Ui.Data.Motor
-    belongs_to :sw, Ui.Data.Motor
+    field :northeast_motor, :integer
+    field :northwest_motor, :integer
+    field :southeast_motor, :integer
+    field :southwest_motor, :integer
+    field :northeast_reversed, :boolean
+    field :northwest_reversed, :boolean
+    field :southeast_reversed, :boolean
+    field :southwest_reversed, :boolean
+    # belongs_to :ne, Ui.Data.Motor
+    # belongs_to :nw, Ui.Data.Motor
+    # belongs_to :se, Ui.Data.Motor
+    # belongs_to :sw, Ui.Data.Motor
   end
 
   # @doc false

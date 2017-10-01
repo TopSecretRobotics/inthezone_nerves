@@ -13,6 +13,7 @@ defmodule Vex.Supervisor do
     # Define workers and child supervisors to be supervised
     children = [
       supervisor(Vex.Event, [], restart: :permanent),
+      supervisor(Vex.State.Supervisor, [], restart: :permanent),
       # worker(Vex.Logger, [], restart: :permanent),
       supervisor(Vex.Robot.Supervisor, [], restart: :permanent),
       supervisor(Vex.Local.Supervisor, [], restart: :permanent)

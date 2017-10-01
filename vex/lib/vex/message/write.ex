@@ -1,6 +1,7 @@
 defmodule Vex.Message.Write do
 
   @topic_motor 0x02
+  @topic_cassette 0x06
 
   defstruct [
     req_id: nil,
@@ -58,6 +59,7 @@ defmodule Vex.Message.Write do
   def topic_to_type!(topic) do
     case topic do
       _ when topic in [@topic_motor, :motor] -> Write.Motor
+      _ when topic in [@topic_cassette, :cassette] -> Write.Cassette
     end
   end
 
@@ -72,6 +74,7 @@ defmodule Vex.Message.Write do
   def type_to_topic!(type) when is_atom(type) do
     case type do
       Write.Motor -> @topic_motor
+      Write.Cassette -> @topic_cassette
     end
   end
 

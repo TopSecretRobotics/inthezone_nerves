@@ -6,6 +6,7 @@ div
     q-toolbar-title Debug
   q-tabs(color="tertiary")
     q-route-tab(name="home", slot="title", label="Home", :to="{ name: 'debug' }", exact)
+    q-route-tab(name="pubsub", slot="title", label="PubSub", :to="{ name: 'debugPubSub' }", exact)
     q-route-tab(name="localServer", slot="title", label="Local Server", :to="{ name: 'debugLocalServer' }")
     q-route-tab(name="localSocket", slot="title", label="Local Socket", :to="{ name: 'debugLocalSocket' }")
     q-route-tab(name="robotServer", slot="title", label="Robot Server", :to="{ name: 'debugRobotServer' }")

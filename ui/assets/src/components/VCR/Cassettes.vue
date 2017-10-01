@@ -1,9 +1,10 @@
 <template lang="pug">
 div
-  //- pre {{ cassettes }}
   template(v-if="cassettes")
     q-list(separator, link)
-      q-item(v-for="cassette of cassettes", :key="cassette.id", :to="{ name: 'vcrCassette', params: { cassetteId: cassette.id } }")
+      template(v-for="cassette of cassettes")
+        cassette-item(:key="cassette.id", :cassette="cassette")
+      //- q-item(v-for="cassette of cassettes", :key="cassette.id", :to="{ name: 'vcrCassette', params: { cassetteId: cassette.id } }")
         template(v-if="cassette.blank")
           q-item-side(color="negative", icon="fiber_manual_record")
         template(v-else-if="cassette.startAt && !cassette.stopAt")
@@ -12,6 +13,7 @@ div
           q-item-side(color="positive", icon="play_circle_filled")
         q-item-main
           q-item-tile(label) {{ cassette.name }}
+          q-item-tile(v-if="durations[cassette.id]", sublabel) {{ durations[cassette.id] }}
   //- q-card(color="negative")
     q-card-title <q-icon name="warning"></q-icon> Warning!
     q-card-separator
@@ -41,9 +43,14 @@ import {
   QToolbarTitle
 } from 'quasar'
 
+import gql from 'graphql-tag'
+
+import CassetteItem from './CassetteItem.vue'
+
 export default {
   name: 'Cassettes',
   components: {
+    CassetteItem,
     QBtn,
     QCard,
     QCardMain,
@@ -62,7 +69,35 @@ export default {
     QToolbar,
     QToolbarTitle
   },
-  props: ['cassettes'],
+  apollo: {
+    cassettes: {
+      query: gql`query Cassettes {
+        cassettes {
+          id
+          name
+          blank
+          startAt
+          stopAt
+          insertedAt
+          updatedAt
+        }
+      }`,
+      fetchPolicy: 'network-only',
+      subscribeToMore: {
+        document: gql`subscription ObserveCassettes {
+          observeCassettes {
+            id
+            name
+            blank
+            startAt
+            stopAt
+            insertedAt
+            updatedAt
+          }
+        }`
+      }
+    }
+  },
   data () {
     return {}
   }

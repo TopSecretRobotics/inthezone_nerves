@@ -18,11 +18,12 @@ defmodule Ui.Application do
       # Start the absinthe subscription endpoint
       supervisor(Absinthe.Subscription, [UiWeb.Endpoint]),
       # Start your own worker by calling: Ui.Worker.start_link(arg1, arg2, arg3)
-      supervisor(Ui.Vex.Event, []),
-      worker(Ui.Vex.Status, []),
-      worker(Ui.Vex.Debug, []),
-      worker(Ui.Vex.Listener, []),
-      worker(Ui.Vex.MotorState, []),
+      supervisor(Ui.VCR.Supervisor, []),
+      # supervisor(Ui.Vex.Event, []),
+      # worker(Ui.Vex.Status, []),
+      # worker(Ui.Vex.Debug, []),
+      # worker(Ui.Vex.Listener, []),
+      # worker(Ui.Vex.MotorState, []),
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

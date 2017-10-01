@@ -58,7 +58,7 @@ defmodule UiGraph.Schema.Config do
     config =
       Ecto.Query.from(c in Ui.Data.Config,
         where: c.id == 0,
-        preload: [drive: [:ne, :nw, :se, :sw]])
+        preload: [:drive])
       |> Ui.Repo.one()
     {:ok, config}
   end

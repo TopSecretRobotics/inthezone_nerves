@@ -4,6 +4,7 @@ defmodule Vex.Message.Read do
   @topic_clock 0x01
   @topic_motor 0x02
   @topic_smartmotor 0x03
+  @topic_cassette 0x06
 
   defstruct [
     req_id: nil,
@@ -62,6 +63,7 @@ defmodule Vex.Message.Read do
       _ when topic in [@topic_clock, :clock] -> Read.Clock
       _ when topic in [@topic_motor, :motor] -> Read.Motor
       _ when topic in [@topic_smartmotor, :smartmotor] -> Read.Smartmotor
+      _ when topic in [@topic_cassette, :cassette] -> Read.Cassette
     end
   end
 
@@ -79,6 +81,7 @@ defmodule Vex.Message.Read do
       Read.Clock -> @topic_clock
       Read.Motor -> @topic_motor
       Read.Smartmotor -> @topic_smartmotor
+      Read.Cassette -> @topic_cassette
     end
   end
 

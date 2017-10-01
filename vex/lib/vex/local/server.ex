@@ -208,6 +208,9 @@ defmodule Vex.Local.Server do
         other
     end
   end
+  def handle_event(:cast, {:vex_rpc_recv, _frame}, :disconnected, _data) do
+    :keep_state_and_data
+  end
   # Info Events
   def handle_event(:info, {@socket, :status, :connected}, :disconnected, data) do
     {:next_state, :connected, data}

@@ -11,6 +11,7 @@ defmodule Ui.Data.Cassette do
     field :blank, :boolean, default: true
     field :pid, :string
     field :data, :string
+    field :play_at, :naive_datetime
     field :start_at, :naive_datetime
     field :stop_at, :naive_datetime
     timestamps()
@@ -24,6 +25,7 @@ defmodule Ui.Data.Cassette do
       :blank,
       :pid,
       :data,
+      :play_at,
       :start_at,
       :stop_at
     ])

@@ -51,57 +51,42 @@ defmodule UiGraph.Schema.Motor do
   object :motor_subscriptions do
     field :observe_motors, type: list_of(:motor) do
       config fn (_args, _info) ->
+        :ok = Ui.State.Motors.observe()
         {:ok, topic: <<>>}
       end
     end
   end
 
   def list(_parent, _args, _info) do
-    require Ecto.Query
-    motors =
-      Ecto.Query.from(m in Ui.Data.Motor,
-        order_by: [asc: m.id])
-      |> Ui.Repo.all()
+    motors = Ui.State.Motors.read()
     {:ok, motors}
   end
 
   def node(_parent, motor_id, _info) do
-    motor = Ui.Repo.get(Ui.Data.Motor, motor_id)
+    motors = Ui.State.Motors.read()
+    motor = Enum.find(motors, fn (motor) ->
+      to_string(motor.id) == motor_id
+    end)
     {:ok, motor}
   end
 
   def update(args = %{ id: motor_id }, _info) do
-    motor = Ui.Repo.get(Ui.Data.Motor, motor_id)
-    if motor do
-      args =
-        if args[:value] && is_integer(args[:value]) do
-          value = args[:value]
-          value =
-            cond do
-              value > 127 -> 127
-              value < -127 -> -127
-              true -> value
-            end
-          :ok = Vex.RPC.write(:motor, motor.index, value)
-          Map.delete(args, :value)
-        else
-          args
+    motors = Ui.State.Motors.read()
+    motor = Enum.find(motors, fn (motor) ->
+      to_string(motor.id) == motor_id
+    end)
+    if motor && args[:value] && is_integer(args[:value]) do
+      value = args[:value]
+      value =
+        cond do
+          value > 127 -> 127
+          value < -127 -> -127
+          true -> value
         end
-      changeset = Ui.Data.Motor.changeset(motor, args)
-      Ecto.Multi.new()
-      |> Ecto.Multi.update(:motor, changeset)
-      |> Ui.Repo.transaction()
-      |> case do
-        {:ok, %{ motor: motor }} ->
-          :ok = Absinthe.Subscription.publish(UiWeb.Endpoint, [motor], [
-            observe_motors: <<>>
-          ])
-          {:ok, %{ motor: motor }}
-        error ->
-          error
-      end
+      :ok = Vex.RPC.write(:motor, motor.index, value)
+      {:ok, %{ motor: motor }}
     else
-      {:error, "motor not found"}
+      {:ok, %{ motor: motor }}
     end
   end
 
@@ -122,15 +107,13 @@ defmodule UiGraph.Schema.Motor do
   end
 
   def reverse_all_motors(_args, _info) do
-    require Ecto.Query
-    motors =
-      Ecto.Query.from(m in Ui.Data.Motor,
-        order_by: [asc: m.id])
-      |> Ui.Repo.all()
+    motors = Ui.State.Motors.read()
     payload =
       for %{ index: index, value: value } <- motors, into: [] do
         {index, value * -1}
       end
+    require Logger
+    Logger.info("reverse: #{inspect payload}")
     :ok = Vex.RPC.write(:motor, :all, payload)
     {:ok, true}
   end
